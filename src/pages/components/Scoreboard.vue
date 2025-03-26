@@ -35,7 +35,9 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
+  text-align: center;
+  margin-left: 1.5rem;
 }
 
 .player-name {

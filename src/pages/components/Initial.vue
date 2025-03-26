@@ -170,7 +170,4 @@ label {
 .selected-container {
   background-color: #d4d4d4;
 }
-
-input {
-}
 </style>
