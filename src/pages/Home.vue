@@ -1,33 +1,19 @@
 <script setup lang="ts">
 import ScoreBoard from './components/Scoreboard.vue'
-import QuestionAlternative from './components/QuestionAlternative.vue'
-import type { Questions } from '../models/Questions'
+import QuestionsDisplay from './components/QuestionsDisplay.vue'
+import type { QuestionAPI, Questions } from '../models/Questions'
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { loadQuestions } from '../services/Questions'
 
 var questionSent = ref(false)
 
-const questions: Questions = {
-  answers_list: [
-    'Oi, tudo bem?',
-    'Nossa, vc é muito linda rssss',
-    'vamo fumar um nargas?',
-    'Tá estudando pra OAB?',
-  ],
-  category: 'teste',
-  correct_answer: 'Tá estudando pra OAB?',
-  difficulty: 'easy',
-  question: 'Qual a melhor maneira de puxar assunto com a gata?',
-  type: 'test',
-}
-
-var currentQuestion = ref<Questions>(questions)
+// pergunta atual sendo exibida na tela
+var currentQuestion = ref<Questions>({})
 
 const sendResponse = () => {
-  console.log('enviando resposta xD')
+  console.log('send answer')
   questionSent.value = true
-
-  console.log(questionSent)
 }
 
 // selecionar resposta
@@ -35,17 +21,15 @@ const sendResponse = () => {
 const answerSelected = ref('')
 
 const toggleSelection = (answer: string) => {
-  console.log(answer)
   answerSelected.value = answer
-
-  console.log(answerSelected)
 }
 
 // próxima pergunta
 
 const nextQuestion = () => {
-  console.log('next question')
+  console.log('press next question')
   handleScoreboard()
+  loadNextQuestion()
   questionSent.value = false
   answerSelected.value = ''
 }
@@ -62,43 +46,73 @@ const handleScoreboard = () => {
     computerScore.value = computerScore.value + 1
   }
 }
+
+//questions parser
+
+const handleQuestionsParse = (questions: QuestionAPI[]): Questions[] => {
+  const questionsParsed: Questions[] = questions.map((question) => ({
+    ...question,
+    answers_list: [
+      ...question.incorrect_answers.map((incorrect) => decodeURIComponent(incorrect)),
+      decodeURIComponent(question.correct_answer),
+    ],
+    question: decodeURIComponent(question.question),
+    correct_answer: decodeURIComponent(question.correct_answer),
+  }))
+  return questionsParsed
+}
+
+// load questions
+
+// lista de todas as perguntas
+var questionsList = ref<Questions[]>([])
+const error = ref('')
+const isLoading = ref(false)
+
+const fetchData = async () => {
+  try {
+    isLoading.value = true
+    const response = await loadQuestions({ amount: 10 })
+    const parsedQuestions = handleQuestionsParse(response.data.results)
+    questionsList.value = parsedQuestions
+    currentQuestion.value = parsedQuestions[Math.floor(Math.random() * questionsList.value.length)]
+  } catch (err: any) {
+    console.log(err)
+    error.value = err.message
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Chama a função quando o componente for montado
+onMounted(fetchData)
+
+// a funcao abaixo extrai a pergunta respondida do array de perguntas total, e coloca outra no lugar dela.
+
+const loadNextQuestion = (): void => {
+  // remover a pergunta respondida do array atual;
+  const updatedQuestionsArray: Questions[] = questionsList.value.filter(
+    (question) => question.question !== currentQuestion.value.question,
+  )
+  questionsList.value = updatedQuestionsArray
+  currentQuestion.value =
+    updatedQuestionsArray[Math.floor(Math.random() * updatedQuestionsArray.length)]
+}
 </script>
 
 <template lang="">
   <div class="wrapper">
     <div class="container">
       <ScoreBoard :playerScore="playerScore" :computerScore="computerScore" />
-      <div>
-        <p class="question-label">{{ currentQuestion.question }}</p>
-        <div
-          class="questions-container"
-          v-for="(answer, index) in currentQuestion.answers_list"
-          :key="index"
-        >
-          <QuestionAlternative
-            :answer="answer"
-            :onClickAnswer="toggleSelection"
-            :answerSelected="answerSelected === answer"
-            :correctAnswer="currentQuestion.correct_answer"
-            :isAnswered="questionSent"
-          />
-        </div>
-      </div>
-      <div class="button-container">
-        <p v-if="questionSent === true && answerSelected === currentQuestion.correct_answer">
-          ✅ Certa resposta!!! ✅
-        </p>
-        <p v-if="questionSent === true && answerSelected !== currentQuestion.correct_answer">
-          ✅ Resposta incorreta ✅
-        </p>
-        <button @click="sendResponse" class="send-answer-button" v-if="questionSent === false">
-          Enviar
-        </button>
 
-        <button @click="nextQuestion" v-if="questionSent === true" class="next-question-button">
-          Próxima pergunta
-        </button>
-      </div>
+      <QuestionsDisplay
+        :answerSelected="answerSelected"
+        :currentQuestion="currentQuestion"
+        :questionSent="questionSent"
+        :sendResponse="sendResponse"
+        :nextQuestion="nextQuestion"
+        :toggleSelection="toggleSelection"
+      />
     </div>
   </div>
 </template>
@@ -110,11 +124,6 @@ button {
   font-family: 'Raleway', sans-serif;
 }
 
-.question-label {
-  font-weight: 500;
-  text-align: center;
-}
-
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -124,68 +133,8 @@ button {
 }
 
 .container {
-  width: 30rem;
+  width: 50rem;
   border: 0.5px solid black;
   border-radius: 5px;
-}
-
-.questions-container {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem 5rem;
-  align-self: center;
-  justify-content: center;
-}
-
-.questions-container:last-child {
-  margin-bottom: 2rem;
-}
-
-.button-container {
-  width: 100%;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.button-container button {
-  border: 0;
-  padding: 0.5rem 0;
-  width: 13rem;
-  font-size: 1rem;
-  font-weight: 500;
-
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  transition: background-color ease 0.3s;
-}
-
-.send-answer-button {
-  color: #fff;
-  background-color: #50c878;
-}
-
-.send-answer-button:hover {
-  background-color: #45b06c;
-}
-
-.send-answer-button:active {
-  background-color: #3a945c;
-}
-
-.next-question-button {
-  background-color: #f0f0f0;
-  color: #353535;
-}
-
-.next-question-button:hover {
-  background-color: #e2e2e2;
-}
-
-.next-question-button:active {
-  background-color: #d4d4d4;
 }
 </style>
