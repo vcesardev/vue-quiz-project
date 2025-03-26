@@ -11,7 +11,7 @@ defineProps<{
     <div class="scoreboard">
       <h3 class="player-name">Player</h3>
       <p class="player-score">{{ playerScore }}</p>
-      <h5>-</h5>
+      <h4>-</h4>
       <p class="player-score">{{ computerScore }}</p>
       <h3 class="player-name">Computer</h3>
     </div>
