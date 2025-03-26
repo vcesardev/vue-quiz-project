@@ -1,3 +1,5 @@
+import './assets/globals.css'
+
 import { createApp } from 'vue'
 import App from './App.vue'
 

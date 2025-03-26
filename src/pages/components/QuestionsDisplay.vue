@@ -15,6 +15,7 @@ defineProps<{
 <template>
   <div>
     <p class="question-label">{{ currentQuestion.question }}</p>
+
     <div
       class="questions-container"
       v-for="(answer, index) in currentQuestion.answers_list"
@@ -47,12 +48,6 @@ defineProps<{
 </template>
 
 <style>
-p,
-h3,
-button {
-  font-family: 'Raleway', sans-serif;
-}
-
 .question-label {
   font-weight: 500;
   text-align: center;
@@ -80,7 +75,7 @@ button {
   gap: 0.3rem;
 }
 
-.button-container button {
+/* .button-container button {
   border: 0;
   padding: 0.5rem 0;
   width: 13rem;
@@ -90,7 +85,7 @@ button {
   border-radius: 5px;
   margin-bottom: 1rem;
   transition: background-color ease 0.3s;
-}
+} */
 
 .send-answer-button {
   color: #fff;

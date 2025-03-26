@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import ScoreBoard from './components/Scoreboard.vue'
 import QuestionsDisplay from './components/QuestionsDisplay.vue'
+import Initial from './components/Initial.vue'
 import type { QuestionAPI, Questions } from '../models/Questions'
 
 import { ref, onMounted } from 'vue'
 import { loadQuestions } from '../services/Questions'
+
+// state abaixo define a exibição das telas
+// 1 - inicial -> 2 - perguntas -> 3 - placar
+
+var renderScreen = ref<number>(1)
 
 var questionSent = ref(false)
 
@@ -55,7 +61,7 @@ const handleQuestionsParse = (questions: QuestionAPI[]): Questions[] => {
     answers_list: [
       ...question.incorrect_answers.map((incorrect) => decodeURIComponent(incorrect)),
       decodeURIComponent(question.correct_answer),
-    ],
+    ].sort(),
     question: decodeURIComponent(question.question),
     correct_answer: decodeURIComponent(question.correct_answer),
   }))
@@ -69,10 +75,13 @@ var questionsList = ref<Questions[]>([])
 const error = ref('')
 const isLoading = ref(false)
 
-const fetchData = async () => {
+const fetchData = async (
+  questionAmount: number,
+  questionDifficulty: 'easy' | 'medium' | 'hard',
+) => {
   try {
     isLoading.value = true
-    const response = await loadQuestions({ amount: 10 })
+    const response = await loadQuestions({ amount: questionAmount, difficulty: questionDifficulty })
     const parsedQuestions = handleQuestionsParse(response.data.results)
     questionsList.value = parsedQuestions
     currentQuestion.value = parsedQuestions[Math.floor(Math.random() * questionsList.value.length)]
@@ -81,11 +90,9 @@ const fetchData = async () => {
     error.value = err.message
   } finally {
     isLoading.value = false
+    renderScreen.value = 2
   }
 }
-
-// Chama a função quando o componente for montado
-onMounted(fetchData)
 
 // a funcao abaixo extrai a pergunta respondida do array de perguntas total, e coloca outra no lugar dela.
 
@@ -103,7 +110,16 @@ const loadNextQuestion = (): void => {
 <template lang="">
   <div class="wrapper">
     <div class="container">
-      <ScoreBoard :playerScore="playerScore" :computerScore="computerScore" />
+      <!-- initial screen -->
+      <Initial :onPressStart="fetchData" v-if="renderScreen === 1" />
+
+      <!-- game screen -->
+      <ScoreBoard
+        :playerScore="playerScore"
+        :computerScore="computerScore"
+        :questionsLeft="questionsList.length"
+        v-if="renderScreen === 2"
+      />
 
       <QuestionsDisplay
         :answerSelected="answerSelected"
@@ -112,7 +128,10 @@ const loadNextQuestion = (): void => {
         :sendResponse="sendResponse"
         :nextQuestion="nextQuestion"
         :toggleSelection="toggleSelection"
+        v-if="renderScreen === 2"
       />
+
+      <!-- End screen -->
     </div>
   </div>
 </template>

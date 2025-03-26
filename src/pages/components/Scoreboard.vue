@@ -2,6 +2,7 @@
 defineProps<{
   playerScore: number
   computerScore: number
+  questionsLeft: number
 }>()
 </script>
 
@@ -14,14 +15,11 @@ defineProps<{
       <p class="player-score">{{ computerScore }}</p>
       <h3 class="player-name">Computer</h3>
     </div>
+    <span>Questions left: {{ questionsLeft }}</span>
   </div>
 </template>
 
 <style scoped>
-p,
-h3 {
-  font-family: 'Raleway', sans-serif;
-}
 .question-container {
   background-color: #50c878;
   align-items: center;

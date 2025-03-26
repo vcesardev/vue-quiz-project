@@ -1,0 +1,15 @@
+body {
+  font-family: 'Raleway', sans-serif;
+}
+
+button {
+  border: 0;
+  padding: 0.5rem 0;
+  width: 13rem;
+  font-size: 1rem;
+  font-weight: 500;
+
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  transition: background-color ease 0.3s;
+}

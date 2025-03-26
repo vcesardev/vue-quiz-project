@@ -2,8 +2,8 @@ import type { AxiosResponse } from 'axios'
 import type { QuestionAPI } from '../models/Questions'
 import { get } from './api'
 
-type QuestionPayloadParams = {
-  difficulty?: 'easy' | 'medium' | 'hard'
+export type QuestionPayloadParams = {
+  difficulty: 'easy' | 'medium' | 'hard'
   amount: number
 }
 
