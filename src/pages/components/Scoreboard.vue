@@ -1,15 +1,22 @@
+<script lang="ts" setup>
+defineProps<{
+  playerScore: number
+  computerScore: number
+}>()
+</script>
+
 <template lang="">
   <div class="question-container">
     <div class="scoreboard">
       <h3 class="player-name">Player</h3>
-      <p class="player-score">0</p>
+      <p class="player-score">{{ playerScore }}</p>
       <h5>-</h5>
-      <p class="player-score">0</p>
+      <p class="player-score">{{ computerScore }}</p>
       <h3 class="player-name">Computer</h3>
     </div>
   </div>
 </template>
-<script></script>
+
 <style scoped>
 p,
 h3 {
