@@ -1,18 +1,19 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import type { Difficulty } from '../../models/Questions'
 
 const props = defineProps<{
-  onPressStart: (questionAmount: number, questionDifficulty: 'easy' | 'medium' | 'hard') => void
+  onPressStart: (questionAmount: number, questionDifficulty: Difficulty) => void
 }>()
 
 var questionAmount = ref<number>(10)
-var questionDifficulty = ref<'easy' | 'medium' | 'hard'>('easy')
+var questionDifficulty = ref<Difficulty>('easy')
 
 const handleQuestionAmountSelect = (number: number): void => {
   questionAmount.value = number
 }
 
-const handleQuestionDifficultySelect = (difficulty: 'easy' | 'medium' | 'hard'): void => {
+const handleQuestionDifficultySelect = (difficulty: Difficulty): void => {
   questionDifficulty.value = difficulty
 }
 
@@ -24,7 +25,7 @@ const handleStartClick = (): void => {
 <template>
   <div class="container">
     <h1>Welcome to the Trivia game!</h1>
-    <h3>Choose your specifications below to start the game.</h3>
+    <h3>Choose the desired options below to start the game.</h3>
 
     <label for="">Number of questions</label>
     <div class="amount-container">
@@ -76,7 +77,7 @@ const handleStartClick = (): void => {
     </div>
 
     <label for="">Difficulty</label>
-    <span>PS:if no difficulty is selected, there will be questions with all difficulties.</span>
+
     <div class="amount-container">
       <div
         class="question-amount-option"

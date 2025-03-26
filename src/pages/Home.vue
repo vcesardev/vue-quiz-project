@@ -2,7 +2,7 @@
 import ScoreBoard from './components/Scoreboard.vue'
 import QuestionsDisplay from './components/QuestionsDisplay.vue'
 import Initial from './components/Initial.vue'
-import type { QuestionAPI, Questions } from '../models/Questions'
+import type { Difficulty, QuestionAPI, Questions } from '../models/Questions'
 
 import { ref, onMounted } from 'vue'
 import { loadQuestions } from '../services/Questions'
@@ -75,10 +75,7 @@ var questionsList = ref<Questions[]>([])
 const error = ref('')
 const isLoading = ref(false)
 
-const fetchData = async (
-  questionAmount: number,
-  questionDifficulty: 'easy' | 'medium' | 'hard',
-) => {
+const fetchData = async (questionAmount: number, questionDifficulty: Difficulty) => {
   try {
     isLoading.value = true
     const response = await loadQuestions({ amount: questionAmount, difficulty: questionDifficulty })

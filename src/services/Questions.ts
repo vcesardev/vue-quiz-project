@@ -1,9 +1,9 @@
 import type { AxiosResponse } from 'axios'
-import type { QuestionAPI } from '../models/Questions'
+import type { Difficulty, QuestionAPI } from '../models/Questions'
 import { get } from './api'
 
 export type QuestionPayloadParams = {
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: Difficulty
   amount: number
 }
 

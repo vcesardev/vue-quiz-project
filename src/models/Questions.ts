@@ -1,6 +1,8 @@
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
 export type QuestionAPI = {
   type: string
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: Difficulty
   category: string
   question: string
   correct_answer: string
@@ -9,7 +11,7 @@ export type QuestionAPI = {
 
 export type Questions = {
   type: string
-  difficulty: 'easy' | 'medium' | 'hard'
+  difficulty: Difficulty
   category: string
   question: string
   correct_answer: string
