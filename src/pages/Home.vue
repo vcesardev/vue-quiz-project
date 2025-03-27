@@ -2,6 +2,7 @@
 import ScoreBoard from './components/Scoreboard.vue'
 import QuestionsDisplay from './components/QuestionsDisplay.vue'
 import Initial from './components/Initial.vue'
+import FinishGame from './components/FinishGame.vue'
 import type { Difficulty, QuestionAPI, Questions } from '../models/Questions'
 
 import { ref, onMounted } from 'vue'
@@ -99,12 +100,27 @@ const loadNextQuestion = (): void => {
     (question) => question.question !== currentQuestion.value.question,
   )
   questionsList.value = updatedQuestionsArray
-  currentQuestion.value =
-    updatedQuestionsArray[Math.floor(Math.random() * updatedQuestionsArray.length)]
+
+  if (questionsList.value.length === 0) {
+    renderScreen.value = 3
+  } else {
+    currentQuestion.value =
+      updatedQuestionsArray[Math.floor(Math.random() * updatedQuestionsArray.length)]
+  }
+}
+
+// restart game
+
+const handleRestartGame = (): void => {
+  renderScreen.value = 1
+  playerScore.value = 0
+  computerScore.value = 0
+  answerSelected.value = ''
+  questionSent.value = false
 }
 </script>
 
-<template lang="">
+<template>
   <div class="wrapper">
     <div class="container">
       <!-- initial screen -->
@@ -115,7 +131,7 @@ const loadNextQuestion = (): void => {
         :playerScore="playerScore"
         :computerScore="computerScore"
         :questionsLeft="questionsList.length"
-        v-if="renderScreen === 2"
+        v-if="renderScreen !== 1"
       />
 
       <QuestionsDisplay
@@ -129,6 +145,13 @@ const loadNextQuestion = (): void => {
       />
 
       <!-- End screen -->
+
+      <FinishGame
+        v-if="renderScreen === 3"
+        :playerScore="playerScore"
+        :computerScore="computerScore"
+        :restartGame="handleRestartGame"
+      />
     </div>
   </div>
 </template>
